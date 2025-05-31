@@ -17,11 +17,13 @@ import ExerciseSelectionModal from '@/components/ExerciseSelectionModal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface WorkoutDayFormProps {
-  initialData?: Partial<WorkoutDay>; // Can be WorkoutDay or null for new
+  initialData?: Partial<WorkoutDay>; 
   onSave: (day: WorkoutDay) => void;
   isEditing: boolean;
-  dayId?: string; // The ID of the day being edited, or undefined for new
+  dayId?: string; 
 }
+
+const DAY_OF_WEEK_NOT_SET_OPTION_VALUE = "__NOT_SET__"; // Unique value for "Not Set" option
 
 export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }: WorkoutDayFormProps) {
   const { toast } = useToast();
@@ -29,16 +31,13 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
 
   const [dayName, setDayName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<DayExercise[]>([]);
-  const [dayOfWeek, setDayOfWeek] = useState(''); // State for Day of Week
+  const [dayOfWeek, setDayOfWeek] = useState(''); 
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
 
   useEffect(() => {
-    // initialData can be null if a dayId was provided but not found, or if truly new.
-    // For a new day, initialData would be {id: '', name: '', exercises: []} from EditDayPageClient
-    // For an existing day, initialData would be the WorkoutDay object.
     setDayName(initialData?.name || '');
-    setSelectedExercises(initialData?.exercises || []); // Keep exercises if provided
-    // TODO: Add dayOfWeek to initialData and handle it here
+    setSelectedExercises(initialData?.exercises || []); 
+    setDayOfWeek(initialData?.dayOfWeek || '');
   }, [initialData]);
 
 
@@ -89,23 +88,21 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dayName.trim()) {
-      // TODO: Add validation for dayOfWeek if it becomes required
       toast({ title: "Validation Error", description: "Day name cannot be empty.", variant: "destructive" });
       return;
     }
 
     try {
       let savedDay: WorkoutDay;
-      if (isEditing && dayId) { // Editing existing day
-        const dayToUpdate: WorkoutDay = { id: dayId, name: dayName, exercises: selectedExercises /* TODO: Add dayOfWeek here */ };
+      if (isEditing && dayId) { 
+        const dayToUpdate: WorkoutDay = { id: dayId, name: dayName, exercises: selectedExercises, dayOfWeek: dayOfWeek };
         savedDay = await updateWorkoutDayMutation(dayToUpdate);
-      } else { // Creating new day
-        const newDayData = { name: dayName, exercises: selectedExercises /* TODO: Add dayOfWeek here */ };
+      } else { 
+        const newDayData = { name: dayName, exercises: selectedExercises, dayOfWeek: dayOfWeek };
         savedDay = await addWorkoutDayMutation(newDayData);
       }
-      onSave(savedDay); // Callback to navigate or perform other actions
+      onSave(savedDay); 
     } catch (error) {
-      // Error toast is handled by the mutation's onError callback in useWorkoutDays hook
       console.error("Failed to save day:", error);
     }
   };
@@ -131,23 +128,34 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
                   className="mt-1"
                 />
               </div>
-                  <div>
-                    <Label htmlFor="dayOfWeek" className="font-semibold">Day of Week</Label>
-                    <Select onValueChange={setDayOfWeek} value={dayOfWeek}>
-                      <SelectTrigger id="dayOfWeek" className="mt-1">
-                        <SelectValue placeholder="Select a day" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Monday">Monday</SelectItem>
-                        <SelectItem value="Tuesday">Tuesday</SelectItem>
-                        <SelectItem value="Wednesday">Wednesday</SelectItem>
-                        <SelectItem value="Thursday">Thursday</SelectItem>
-                        <SelectItem value="Friday">Friday</SelectItem>
-                        <SelectItem value="Saturday">Saturday</SelectItem>
-                        <SelectItem value="Sunday">Sunday</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <div>
+                <Label htmlFor="dayOfWeek" className="font-semibold">Day of Week</Label>
+                <Select 
+                  onValueChange={(value) => {
+                    if (value === DAY_OF_WEEK_NOT_SET_OPTION_VALUE) {
+                      setDayOfWeek('');
+                    } else {
+                      setDayOfWeek(value);
+                    }
+                  }} 
+                  value={dayOfWeek} // Value is the actual state: "" or "Monday", etc.
+                                     // Placeholder will show if value is "" and no item matches ""
+                >
+                  <SelectTrigger id="dayOfWeek" className="mt-1">
+                    <SelectValue placeholder="Select a day" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={DAY_OF_WEEK_NOT_SET_OPTION_VALUE}>Not Set</SelectItem>
+                    <SelectItem value="Monday">Monday</SelectItem>
+                    <SelectItem value="Tuesday">Tuesday</SelectItem>
+                    <SelectItem value="Wednesday">Wednesday</SelectItem>
+                    <SelectItem value="Thursday">Thursday</SelectItem>
+                    <SelectItem value="Friday">Friday</SelectItem>
+                    <SelectItem value="Saturday">Saturday</SelectItem>
+                    <SelectItem value="Sunday">Sunday</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>

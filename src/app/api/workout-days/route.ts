@@ -10,6 +10,7 @@ export async function GET() {
       SELECT 
         wd.id, 
         wd.name,
+        wd.dayOfWeek,
         (SELECT json_group_array(
                   json_object(
                     'instanceId', de.instanceId, 
@@ -32,7 +33,8 @@ export async function GET() {
 
     const days = daysRaw.map(day => ({
       ...day,
-      exercises: day.exercises_json ? JSON.parse(day.exercises_json).sort((a: DayExercise,b: DayExercise) => a.sort_order - b.sort_order) : []
+      exercises: day.exercises_json ? JSON.parse(day.exercises_json).sort((a: DayExercise,b: DayExercise) => a.sort_order - b.sort_order) : [],
+      dayOfWeek: day.dayOfWeek || '', // Ensure dayOfWeek is always a string
     }));
     
     return NextResponse.json(days);
@@ -44,7 +46,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, exercises = [] } = await request.json() as Partial<WorkoutDay & {id?: string}>;
+    const { name, exercises = [], dayOfWeek = "" } = await request.json() as Partial<WorkoutDay & {id?: string}>;
 
     if (!name) {
       return NextResponse.json({ message: 'Name is required' }, { status: 400 });
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
     const newDayId = crypto.randomUUID();
 
     await db.run('BEGIN TRANSACTION;');
-    await db.run('INSERT INTO workout_days (id, name) VALUES (?, ?)', newDayId, name);
+    await db.run('INSERT INTO workout_days (id, name, dayOfWeek) VALUES (?, ?, ?)', newDayId, name, dayOfWeek);
 
     for (let i = 0; i < exercises.length; i++) {
       const ex = exercises[i];
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
     await db.run('COMMIT;');
 
-    const newDay: WorkoutDay = { id: newDayId, name, exercises };
+    const newDay: WorkoutDay = { id: newDayId, name, exercises, dayOfWeek };
     return NextResponse.json(newDay, { status: 201 });
 
   } catch (error) {

@@ -20,5 +20,6 @@ export interface DayExercise {
 export interface WorkoutDay {
   id: string;
   name: string;
+  dayOfWeek: string; // e.g., "Monday", "Tuesday", or "" if not set
   exercises: DayExercise[]; // Order in this array defines the workout sequence
 }
