@@ -15,9 +15,10 @@ Follow these instructions to set up and run the app locally after cloning the re
 ### Installation
 
 1.  Clone the repository:
+git clone https://github.com/bitdinker/bbworkout.git
 
+2.  Install packages
 npm install
 
+3.  Enjoy
 npm run dev
-
-!!
