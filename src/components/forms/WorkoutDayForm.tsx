@@ -17,11 +17,13 @@ import ExerciseSelectionModal from '@/components/ExerciseSelectionModal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface WorkoutDayFormProps {
-  initialData?: Partial<WorkoutDay>; // Can be WorkoutDay or null for new
+  initialData?: Partial<WorkoutDay>; 
   onSave: (day: WorkoutDay) => void;
   isEditing: boolean;
-  dayId?: string; // The ID of the day being edited, or undefined for new
+  dayId?: string; 
 }
+
+const DAY_OF_WEEK_NOT_SET_OPTION_VALUE = "__NOT_SET__"; // Unique value for "Not Set" option
 
 export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }: WorkoutDayFormProps) {
   const { toast } = useToast();
@@ -29,7 +31,7 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
 
   const [dayName, setDayName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<DayExercise[]>([]);
-  const [dayOfWeek, setDayOfWeek] = useState(''); // State for Day of Week
+  const [dayOfWeek, setDayOfWeek] = useState(''); 
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
 
   useEffect(() => {
@@ -126,24 +128,34 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
                   className="mt-1"
                 />
               </div>
-                  <div>
-                    <Label htmlFor="dayOfWeek" className="font-semibold">Day of Week</Label>
-                    <Select onValueChange={setDayOfWeek} value={dayOfWeek}>
-                      <SelectTrigger id="dayOfWeek" className="mt-1">
-                        <SelectValue placeholder="Select a day" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Not Set</SelectItem>
-                        <SelectItem value="Monday">Monday</SelectItem>
-                        <SelectItem value="Tuesday">Tuesday</SelectItem>
-                        <SelectItem value="Wednesday">Wednesday</SelectItem>
-                        <SelectItem value="Thursday">Thursday</SelectItem>
-                        <SelectItem value="Friday">Friday</SelectItem>
-                        <SelectItem value="Saturday">Saturday</SelectItem>
-                        <SelectItem value="Sunday">Sunday</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <div>
+                <Label htmlFor="dayOfWeek" className="font-semibold">Day of Week</Label>
+                <Select 
+                  onValueChange={(value) => {
+                    if (value === DAY_OF_WEEK_NOT_SET_OPTION_VALUE) {
+                      setDayOfWeek('');
+                    } else {
+                      setDayOfWeek(value);
+                    }
+                  }} 
+                  value={dayOfWeek} // Value is the actual state: "" or "Monday", etc.
+                                     // Placeholder will show if value is "" and no item matches ""
+                >
+                  <SelectTrigger id="dayOfWeek" className="mt-1">
+                    <SelectValue placeholder="Select a day" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={DAY_OF_WEEK_NOT_SET_OPTION_VALUE}>Not Set</SelectItem>
+                    <SelectItem value="Monday">Monday</SelectItem>
+                    <SelectItem value="Tuesday">Tuesday</SelectItem>
+                    <SelectItem value="Wednesday">Wednesday</SelectItem>
+                    <SelectItem value="Thursday">Thursday</SelectItem>
+                    <SelectItem value="Friday">Friday</SelectItem>
+                    <SelectItem value="Saturday">Saturday</SelectItem>
+                    <SelectItem value="Sunday">Sunday</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
