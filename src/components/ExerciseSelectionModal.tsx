@@ -114,11 +114,12 @@ export default function ExerciseSelectionModal({
                           <CardContent className="p-4 flex-grow flex flex-col justify-between">
                             <div className="relative w-full aspect-[4/3] bg-muted rounded-md overflow-hidden mb-3">
                               <Image
-                                src={`https://placehold.co/300x225.png`}
+                                src={`/assets/${exercise.id}.png`}
                                 alt={exercise.name}
-                                layout="fill"
-                                objectFit="cover"
+                                fill
+                                style={{ objectFit: "cover" }}
                                 data-ai-hint={generateAiHint(exercise.name)}
+                                unoptimized
                               />
                             </div>
                             <Button size="sm" className="w-full mt-auto py-2 text-sm" onClick={() => handleExerciseAdd(exercise)}>

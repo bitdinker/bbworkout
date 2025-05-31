@@ -12,7 +12,6 @@ export interface DayExercise {
   exerciseId: string; // ID from PredefinedExercise
   name: string;
   bodyPart: string;
-  imageFilename: string;
   reps: number;
   sets: number;
 }

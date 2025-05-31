@@ -58,7 +58,6 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
       exerciseId: predefinedExercise.id,
       name: predefinedExercise.name,
       bodyPart: predefinedExercise.bodyPart,
-      imageFilename: predefinedExercise.imageFilename,
       reps: 10,
       sets: 3,
     };
@@ -196,12 +195,13 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
                     <li key={exercise.instanceId} className="p-4 border rounded-lg bg-card shadow-sm flex flex-col space-y-3">
                       <div className="flex items-start space-x-4">
                         <Image
-                          src={`https://placehold.co/80x80.png`}
+                          src={`/assets/${exercise.exerciseId}.png`}
                           alt={exercise.name}
-                          width={80}
-                          height={80}
+                          width={200}
+                          height={200}
                           className="rounded-md object-cover"
                           data-ai-hint={generateAiHint(exercise.name)}
+                          unoptimized
                         />
                         <div className="flex-grow space-y-2">
                           <h4 className="font-semibold text-lg">{exercise.name}</h4>

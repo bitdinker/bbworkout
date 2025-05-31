@@ -22,7 +22,6 @@ export async function GET() {
                     'exerciseId', de.exerciseId, 
                     'name', de.name,
                     'bodyPart', de.bodyPart,
-                    'imageFilename', de.imageFilename,
                     'reps', de.reps,
                     'sets', de.sets,
                     'sort_order', de.sort_order
@@ -70,13 +69,12 @@ export async function POST(request: NextRequest) {
     for (let i = 0; i < exercises.length; i++) {
       const ex = exercises[i];
       await db.run(
-        'INSERT INTO day_exercises (instanceId, workout_day_id, exerciseId, name, bodyPart, imageFilename, reps, sets, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO day_exercises (instanceId, workout_day_id, exerciseId, name, bodyPart, reps, sets, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         ex.instanceId || crypto.randomUUID(), // Ensure instanceId if not provided
         newDayId,
         ex.exerciseId,
         ex.name,
         ex.bodyPart,
-        ex.imageFilename,
         ex.reps,
         ex.sets,
         i // Use array index for sort_order

@@ -36,7 +36,6 @@ async function initializeDb(): Promise<Database<sqlite3.Database, sqlite3.Statem
       exerciseId TEXT NOT NULL,
       name TEXT NOT NULL,
       bodyPart TEXT NOT NULL,
-      imageFilename TEXT NOT NULL,
       reps INTEGER NOT NULL,
       sets INTEGER NOT NULL,
       sort_order INTEGER NOT NULL,

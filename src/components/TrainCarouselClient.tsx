@@ -95,11 +95,12 @@ export default function TrainCarouselClient({ dayId }: TrainCarouselClientProps)
                 <Card className="shadow-xl overflow-hidden">
                   <div className="relative w-full h-64 md:h-80 bg-muted">
                     <Image
-                      src={`https://placehold.co/600x400.png`}
+                      src={`/assets/${exercise.exerciseId}.png`}
                       alt={exercise.name}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                       data-ai-hint={generateAiHint(exercise.name)}
+                      unoptimized
                     />
                   </div>
                   <CardHeader className="text-center">
