@@ -20,5 +20,10 @@ git clone https://github.com/bitdinker/bbworkout.git
 2.  Install packages
 npm install
 
+or: cmd /c "cd bbworkout && npm install"
+in case gives error
+
 3.  Enjoy
 npm run dev
+
+or: cmd /c "cd bbworkout && npm run dev"
