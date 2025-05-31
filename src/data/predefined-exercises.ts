@@ -1,0 +1,182 @@
+
+import type { PredefinedExercise } from '@/lib/types';
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^\w-]+/g, '');
+}
+
+const exerciseListRaw: Array<{name: string, bodyPart: string}> = [
+  // Chest
+  { name: 'Bench Press Flat', bodyPart: 'Chest' },
+  { name: 'Bench Press Incline', bodyPart: 'Chest' },
+  { name: 'Bench Press Decline', bodyPart: 'Chest' },
+  { name: 'Close-Grip Bench Press', bodyPart: 'Chest' },
+  { name: 'Reverse-Grip Bench Press', bodyPart: 'Chest' },
+  { name: 'Dumbbell Press Flat', bodyPart: 'Chest' },
+  { name: 'Dumbbell Press Incline', bodyPart: 'Chest' },
+  { name: 'Dumbbell Press Decline', bodyPart: 'Chest' },
+  { name: 'Dumbbell Flyes Flat', bodyPart: 'Chest' },
+  { name: 'Dumbbell Flyes Incline', bodyPart: 'Chest' },
+  { name: 'Dumbbell Flyes Decline', bodyPart: 'Chest' },
+  { name: 'Dumbbell Pullover', bodyPart: 'Chest' },
+  { name: 'Chest Press Machine Flat', bodyPart: 'Chest' },
+  { name: 'Chest Press Machine Incline', bodyPart: 'Chest' },
+  { name: 'Pec Deck Machine', bodyPart: 'Chest' },
+  { name: 'Hammer Strength Press', bodyPart: 'Chest' },
+  { name: 'Cable Crossover High', bodyPart: 'Chest' },
+  { name: 'Cable Crossover Mid', bodyPart: 'Chest' },
+  { name: 'Cable Crossover Low', bodyPart: 'Chest' },
+  { name: 'Single Arm Cable Fly', bodyPart: 'Chest' },
+  { name: 'Cable Press', bodyPart: 'Chest' },
+  { name: 'Push-Up Standard', bodyPart: 'Chest' },
+  { name: 'Push-Up Incline', bodyPart: 'Chest' },
+  { name: 'Push-Up Decline', bodyPart: 'Chest' },
+  { name: 'Chest Dips', bodyPart: 'Chest' },
+  // Shoulders
+  { name: 'Overhead Press Barbell', bodyPart: 'Shoulders' },
+  { name: 'Behind-the-Neck Press', bodyPart: 'Shoulders' },
+  { name: 'Front Press', bodyPart: 'Shoulders' },
+  { name: 'Seated Dumbbell Press', bodyPart: 'Shoulders' },
+  { name: 'Standing Dumbbell Press', bodyPart: 'Shoulders' },
+  { name: 'Dumbbell Lateral Raise', bodyPart: 'Shoulders' },
+  { name: 'Dumbbell Front Raise', bodyPart: 'Shoulders' },
+  { name: 'Dumbbell Rear Delt Fly', bodyPart: 'Shoulders' },
+  { name: 'Arnold Press', bodyPart: 'Shoulders' },
+  { name: 'Shoulder Press Machine', bodyPart: 'Shoulders' },
+  { name: 'Lateral Raise Machine', bodyPart: 'Shoulders' },
+  { name: 'Reverse Pec Deck', bodyPart: 'Shoulders' },
+  { name: 'Cable Lateral Raise Front', bodyPart: 'Shoulders' },
+  { name: 'Cable Lateral Raise Side', bodyPart: 'Shoulders' },
+  { name: 'Cable Lateral Raise Rear', bodyPart: 'Shoulders' },
+  { name: 'Cable Face Pull', bodyPart: 'Shoulders' },
+  { name: 'Pike Push-Up', bodyPart: 'Shoulders' },
+  { name: 'Handstand Push-Up', bodyPart: 'Shoulders' },
+  // Biceps
+  { name: 'Barbell Curl', bodyPart: 'Biceps' },
+  { name: 'EZ-Bar Curl', bodyPart: 'Biceps' },
+  { name: 'Drag Curl', bodyPart: 'Biceps' },
+  { name: 'Reverse Curl', bodyPart: 'Biceps' },
+  { name: 'Alternating Dumbbell Curl', bodyPart: 'Biceps' },
+  { name: 'Hammer Curl', bodyPart: 'Biceps' },
+  { name: 'Concentration Curl', bodyPart: 'Biceps' },
+  { name: 'Zottman Curl', bodyPart: 'Biceps' },
+  { name: 'Preacher Curl Machine', bodyPart: 'Biceps' },
+  { name: 'Cable Curl', bodyPart: 'Biceps' },
+  { name: 'Rope Hammer Curl', bodyPart: 'Biceps' },
+  { name: 'Concentration Cable Curl', bodyPart: 'Biceps' },
+  { name: 'Chin-Up', bodyPart: 'Biceps' },
+  { name: 'Bar Isometric Hold', bodyPart: 'Biceps' },
+  // Triceps
+  { name: 'Close-Grip Bench Press', bodyPart: 'Triceps' }, // Note: Also in Chest, distinct for Triceps focus
+  { name: 'Skull Crushers', bodyPart: 'Triceps' },
+  { name: 'JM Press', bodyPart: 'Triceps' },
+  { name: 'Overhead Dumbbell Extension', bodyPart: 'Triceps' },
+  { name: 'Triceps Kickback', bodyPart: 'Triceps' },
+  { name: 'Tate Press', bodyPart: 'Triceps' },
+  { name: 'Triceps Pushdown Machine', bodyPart: 'Triceps' },
+  { name: 'Assisted Dip Machine', bodyPart: 'Triceps' },
+  { name: 'Rope Pushdown', bodyPart: 'Triceps' },
+  { name: 'Straight Bar Pushdown', bodyPart: 'Triceps' },
+  { name: 'Overhead Cable Extension Rope', bodyPart: 'Triceps' },
+  { name: 'Overhead Cable Extension Bar', bodyPart: 'Triceps' },
+  { name: 'Dips', bodyPart: 'Triceps' },
+  { name: 'Bench Dips', bodyPart: 'Triceps' },
+  { name: 'Diamond Push-Up', bodyPart: 'Triceps' },
+  // Back
+  { name: 'Deadlift', bodyPart: 'Back' },
+  { name: 'Romanian Deadlift', bodyPart: 'Back' },
+  { name: 'Bent Over Row', bodyPart: 'Back' },
+  { name: 'Pendlay Row', bodyPart: 'Back' },
+  { name: 'T-Bar Row', bodyPart: 'Back' },
+  { name: 'Single Arm Dumbbell Row', bodyPart: 'Back' },
+  { name: 'Chest-Supported Dumbbell Row', bodyPart: 'Back' },
+  { name: 'Renegade Row', bodyPart: 'Back' },
+  { name: 'Lat Pulldown', bodyPart: 'Back' },
+  { name: 'Seated Cable Row', bodyPart: 'Back' },
+  { name: 'Hammer Strength Row', bodyPart: 'Back' },
+  { name: 'Cable Straight Arm Pulldown', bodyPart: 'Back' },
+  { name: 'Low Pulley Row', bodyPart: 'Back' },
+  { name: 'Pull-Up Wide', bodyPart: 'Back' },
+  { name: 'Pull-Up Neutral', bodyPart: 'Back' },
+  { name: 'Chin-Up', bodyPart: 'Back' }, // Note: Also in Biceps
+  { name: 'Inverted Row', bodyPart: 'Back' },
+  // Quads
+  { name: 'Back Squat', bodyPart: 'Quads' },
+  { name: 'Front Squat', bodyPart: 'Quads' },
+  { name: 'Hack Squat Barbell', bodyPart: 'Quads' },
+  { name: 'Zercher Squat', bodyPart: 'Quads' },
+  { name: 'Goblet Squat', bodyPart: 'Quads' },
+  { name: 'Bulgarian Split Squat', bodyPart: 'Quads' },
+  { name: 'Dumbbell Step-Up', bodyPart: 'Quads' },
+  { name: 'Leg Press', bodyPart: 'Quads' },
+  { name: 'Hack Squat Machine', bodyPart: 'Quads' },
+  { name: 'Leg Extension Machine', bodyPart: 'Quads' },
+  { name: 'Cable Step-Up', bodyPart: 'Quads' },
+  { name: 'Cable Leg Extension', bodyPart: 'Quads' },
+  { name: 'Pistol Squat', bodyPart: 'Quads' },
+  { name: 'Wall Sit', bodyPart: 'Quads' },
+  { name: 'Jump Squat', bodyPart: 'Quads' },
+  // Hamstrings
+  { name: 'Romanian Deadlift', bodyPart: 'Hamstrings' }, // Note: Also in Back
+  { name: 'Good Morning', bodyPart: 'Hamstrings' },
+  { name: 'Dumbbell Romanian Deadlift', bodyPart: 'Hamstrings' },
+  { name: 'Swiss Ball Dumbbell Curl', bodyPart: 'Hamstrings' },
+  { name: 'Lying Leg Curl Machine', bodyPart: 'Hamstrings' },
+  { name: 'Seated Leg Curl Machine', bodyPart: 'Hamstrings' },
+  { name: 'Standing Leg Curl Machine', bodyPart: 'Hamstrings' },
+  { name: 'Cable Leg Curl', bodyPart: 'Hamstrings' },
+  { name: 'Glute-Ham Raise', bodyPart: 'Hamstrings' },
+  { name: 'Nordic Curl', bodyPart: 'Hamstrings' },
+  // Glutes
+  { name: 'Hip Thrust Barbell', bodyPart: 'Glutes' },
+  { name: 'Glute Bridge Barbell', bodyPart: 'Glutes' },
+  { name: 'Sumo Deadlift', bodyPart: 'Glutes' },
+  { name: 'Hip Thrust Dumbbell', bodyPart: 'Glutes' },
+  { name: 'Glute Bridge Dumbbell', bodyPart: 'Glutes' },
+  { name: 'Glute Kickback Machine', bodyPart: 'Glutes' },
+  { name: 'Cable Glute Kickback', bodyPart: 'Glutes' },
+  { name: 'Cable Pull-Through', bodyPart: 'Glutes' },
+  // Calves
+  { name: 'Standing Calf Raise Barbell', bodyPart: 'Calves' },
+  { name: 'Seated Calf Raise Barbell', bodyPart: 'Calves' },
+  { name: 'Standing Calf Raise Dumbbell', bodyPart: 'Calves' },
+  { name: 'Single-Leg Calf Raise Dumbbell', bodyPart: 'Calves' },
+  { name: 'Standing Calf Raise Machine', bodyPart: 'Calves' },
+  { name: 'Seated Calf Raise Machine', bodyPart: 'Calves' },
+  { name: 'Donkey Calf Raise Machine', bodyPart: 'Calves' },
+  { name: 'Double-Leg Calf Raise', bodyPart: 'Calves' },
+  { name: 'Single-Leg Calf Raise', bodyPart: 'Calves' },
+  { name: 'Stair Calf Raise', bodyPart: 'Calves' },
+  // Core / Abs
+  { name: 'Crunch', bodyPart: 'Core / Abs' },
+  { name: 'Leg Raise', bodyPart: 'Core / Abs' },
+  { name: 'Plank', bodyPart: 'Core / Abs' },
+  { name: 'V-Up', bodyPart: 'Core / Abs' },
+  { name: 'Russian Twist', bodyPart: 'Core / Abs' },
+  { name: 'Weighted Sit-Up', bodyPart: 'Core / Abs' },
+  { name: 'Landmine Twist', bodyPart: 'Core / Abs' },
+  { name: 'Overhead Carry', bodyPart: 'Core / Abs' },
+  { name: 'Barbell Rollout', bodyPart: 'Core / Abs' },
+  { name: 'Ab Crunch Machine', bodyPart: 'Core / Abs' },
+  { name: 'Cable Ab Pulldown', bodyPart: 'Core / Abs' },
+  { name: 'Cable Rope Crunch', bodyPart: 'Core / Abs' },
+  { name: 'Cable Oblique Twist', bodyPart: 'Core / Abs' },
+  { name: 'Cable Woodchopper', bodyPart: 'Core / Abs' },
+];
+
+export const PREDEFINED_EXERCISES: PredefinedExercise[] = exerciseListRaw.map((ex, index) => ({
+  id: `pe${index + 1}`,
+  name: ex.name,
+  bodyPart: ex.bodyPart,
+  imageFilename: `${slugify(ex.name)}.png`,
+}));
+
+export function generateAiHint(exerciseName: string): string {
+  const words = exerciseName.toLowerCase().split(' ');
+  if (words.length === 1) return words[0];
+  if (words.length >= 2) return `${words[0]} ${words[1]}`;
+  return "gym exercise"; // Fallback
+}
