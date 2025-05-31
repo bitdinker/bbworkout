@@ -14,6 +14,7 @@ import { PlusCircle, Trash2, ArrowUp, ArrowDown, Save, ListPlus } from 'lucide-r
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from "@/hooks/use-toast";
 import ExerciseSelectionModal from '@/components/ExerciseSelectionModal';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface WorkoutDayFormProps {
   initialData?: Partial<WorkoutDay>; // Can be WorkoutDay or null for new
@@ -28,6 +29,7 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
 
   const [dayName, setDayName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<DayExercise[]>([]);
+  const [dayOfWeek, setDayOfWeek] = useState(''); // State for Day of Week
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
 
   useEffect(() => {
@@ -35,7 +37,8 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
     // For a new day, initialData would be {id: '', name: '', exercises: []} from EditDayPageClient
     // For an existing day, initialData would be the WorkoutDay object.
     setDayName(initialData?.name || '');
-    setSelectedExercises(initialData?.exercises || []);
+    setSelectedExercises(initialData?.exercises || []); // Keep exercises if provided
+    // TODO: Add dayOfWeek to initialData and handle it here
   }, [initialData]);
 
 
@@ -86,6 +89,7 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dayName.trim()) {
+      // TODO: Add validation for dayOfWeek if it becomes required
       toast({ title: "Validation Error", description: "Day name cannot be empty.", variant: "destructive" });
       return;
     }
@@ -93,10 +97,10 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
     try {
       let savedDay: WorkoutDay;
       if (isEditing && dayId) { // Editing existing day
-        const dayToUpdate: WorkoutDay = { id: dayId, name: dayName, exercises: selectedExercises };
+        const dayToUpdate: WorkoutDay = { id: dayId, name: dayName, exercises: selectedExercises /* TODO: Add dayOfWeek here */ };
         savedDay = await updateWorkoutDayMutation(dayToUpdate);
       } else { // Creating new day
-        const newDayData = { name: dayName, exercises: selectedExercises };
+        const newDayData = { name: dayName, exercises: selectedExercises /* TODO: Add dayOfWeek here */ };
         savedDay = await addWorkoutDayMutation(newDayData);
       }
       onSave(savedDay); // Callback to navigate or perform other actions
@@ -114,7 +118,7 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
             <CardTitle className="text-xl">Day Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="dayName" className="font-semibold">Day Name</Label>
                 <Input
@@ -127,6 +131,23 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
                   className="mt-1"
                 />
               </div>
+                  <div>
+                    <Label htmlFor="dayOfWeek" className="font-semibold">Day of Week</Label>
+                    <Select onValueChange={setDayOfWeek} value={dayOfWeek}>
+                      <SelectTrigger id="dayOfWeek" className="mt-1">
+                        <SelectValue placeholder="Select a day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Monday">Monday</SelectItem>
+                        <SelectItem value="Tuesday">Tuesday</SelectItem>
+                        <SelectItem value="Wednesday">Wednesday</SelectItem>
+                        <SelectItem value="Thursday">Thursday</SelectItem>
+                        <SelectItem value="Friday">Friday</SelectItem>
+                        <SelectItem value="Saturday">Saturday</SelectItem>
+                        <SelectItem value="Sunday">Sunday</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
             </div>
           </CardContent>
         </Card>
@@ -168,17 +189,6 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
                           <p className="text-xs text-muted-foreground">{exercise.bodyPart}</p>
                           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                             <div>
-                              <Label htmlFor={`reps-${exercise.instanceId}`} className="text-xs">Reps</Label>
-                              <Input
-                                id={`reps-${exercise.instanceId}`}
-                                type="number"
-                                min="0"
-                                value={exercise.reps}
-                                onChange={e => handleExerciseDetailChange(exercise.instanceId, 'reps', e.target.value)}
-                                className="h-8 mt-1"
-                              />
-                            </div>
-                            <div>
                               <Label htmlFor={`sets-${exercise.instanceId}`} className="text-xs">Sets</Label>
                               <Input
                                 id={`sets-${exercise.instanceId}`}
@@ -188,6 +198,17 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
                                 onChange={e => handleExerciseDetailChange(exercise.instanceId, 'sets', e.target.value)}
                                 className="h-8 mt-1"
                               />
+                            </div>
+                            <div>
+                              <Label htmlFor={`reps-${exercise.instanceId}`} className="text-xs">Reps</Label>
+                              <Input
+                                id={`reps-${exercise.instanceId}`}
+                                type="number"
+                                min="0"
+                                value={exercise.reps}
+                                onChange={e => handleExerciseDetailChange(exercise.instanceId, 'reps', e.target.value)}
+                                className="h-8 mt-1" 
+                              /> 
                             </div>
                           </div>
                         </div>
