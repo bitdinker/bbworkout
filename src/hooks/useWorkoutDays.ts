@@ -73,7 +73,12 @@ export function useWorkoutDays() {
   const getWorkoutDayByIdQuery = (dayId: string | undefined) => {
     return useQuery<WorkoutDay | null, Error>({
       queryKey: [WORKOUT_DAYS_QUERY_KEY, dayId],
-      queryFn: () => dayId ? fetchWorkoutDayById(dayId) : Promise.resolve(null),
+      queryFn: async () => {
+        if (!dayId) return Promise.resolve(null);
+        const data = await fetchWorkoutDayById(dayId);
+        console.log('Fetched workout day data:', data);
+        return data;
+      },
       enabled: !!dayId, // Only run query if dayId is provided
     });
   };

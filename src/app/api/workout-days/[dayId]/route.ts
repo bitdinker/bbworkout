@@ -3,6 +3,11 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getDb } from '@/lib/db';
 import type { WorkoutDay, DayExercise } from '@/lib/types';
 
+// Extended type for DB result that includes sort_order
+interface DayExerciseWithSortOrder extends DayExercise {
+  sort_order: number;
+}
+
 interface RouteParams {
   params: { dayId: string };
 }
@@ -41,13 +46,20 @@ async function getWorkoutDayFromDb(dayId: string, db: Awaited<ReturnType<typeof 
     id: dayRaw.id,
     name: dayRaw.name,
     dayOfWeek: typeof dayRaw.dayOfWeek === 'string' ? dayRaw.dayOfWeek : '', // Ensure dayOfWeek is always a string
-    exercises: dayRaw.exercises_json ? JSON.parse(dayRaw.exercises_json).sort((a: DayExercise,b: DayExercise) => a.sort_order - b.sort_order) : []
+    exercises: dayRaw.exercises_json ? 
+      JSON.parse(dayRaw.exercises_json)
+        .sort((a: DayExerciseWithSortOrder, b: DayExerciseWithSortOrder) => a.sort_order - b.sort_order)
+        .map(({sort_order, ...exercise}: DayExerciseWithSortOrder) => exercise) // Remove sort_order from the final exercises
+      : []
   };
   return day;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { dayId } = params;
+  // Await the params object before accessing its properties
+  const resolvedParams = await Promise.resolve(params);
+  const dayId = resolvedParams.dayId;
+  
   try {
     const db = await getDb();
     const day = await getWorkoutDayFromDb(dayId, db);
@@ -64,7 +76,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { dayId } = params;
+  // Await the params object before accessing its properties
+  const resolvedParams = await Promise.resolve(params);
+  const dayId = resolvedParams.dayId;
+  
   const db = await getDb(); // Get DB instance early for potential rollback
 
   try {
@@ -119,7 +134,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const { dayId } = params;
+  // Await the params object before accessing its properties
+  const resolvedParams = await Promise.resolve(params);
+  const dayId = resolvedParams.dayId;
+  
   try {
     const db = await getDb();
     // ON DELETE CASCADE will handle deleting associated day_exercises

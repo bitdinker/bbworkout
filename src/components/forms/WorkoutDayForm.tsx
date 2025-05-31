@@ -37,8 +37,17 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
   useEffect(() => {
     setDayName(initialData?.name || '');
     setSelectedExercises(initialData?.exercises || []); 
-    setDayOfWeek(initialData?.dayOfWeek || '');
+    
+    // Make sure we get the dayOfWeek value
+    const dayWeekValue = initialData?.dayOfWeek || '';
+    console.log('Initial dayOfWeek value:', dayWeekValue, initialData);
+    setDayOfWeek(dayWeekValue);
   }, [initialData]);
+
+  // Debug the current value of dayOfWeek state
+  useEffect(() => {
+    console.log('Current dayOfWeek state:', dayOfWeek);
+  }, [dayOfWeek]);
 
 
   const handleAddExerciseFromModal = (predefinedExercise: PredefinedExercise) => {
@@ -131,15 +140,17 @@ export default function WorkoutDayForm({ initialData, onSave, isEditing, dayId }
               <div>
                 <Label htmlFor="dayOfWeek" className="font-semibold">Day of Week</Label>
                 <Select 
+                  key={`day-select-${dayOfWeek || DAY_OF_WEEK_NOT_SET_OPTION_VALUE}`}
                   onValueChange={(value) => {
+                    console.log('Select value changed to:', value);
                     if (value === DAY_OF_WEEK_NOT_SET_OPTION_VALUE) {
                       setDayOfWeek('');
                     } else {
                       setDayOfWeek(value);
                     }
                   }} 
-                  value={dayOfWeek} // Value is the actual state: "" or "Monday", etc.
-                                     // Placeholder will show if value is "" and no item matches ""
+                  value={dayOfWeek || DAY_OF_WEEK_NOT_SET_OPTION_VALUE} // Use NOT_SET if dayOfWeek is empty
+                  defaultValue={dayOfWeek || DAY_OF_WEEK_NOT_SET_OPTION_VALUE}
                 >
                   <SelectTrigger id="dayOfWeek" className="mt-1">
                     <SelectValue placeholder="Select a day" />

@@ -3,6 +3,11 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getDb } from '@/lib/db';
 import type { WorkoutDay, DayExercise } from '@/lib/types';
 
+// Extended type for DB result that includes sort_order
+interface DayExerciseWithSortOrder extends DayExercise {
+  sort_order: number;
+}
+
 export async function GET() {
   try {
     const db = await getDb();
@@ -33,7 +38,11 @@ export async function GET() {
 
     const days = daysRaw.map(day => ({
       ...day,
-      exercises: day.exercises_json ? JSON.parse(day.exercises_json).sort((a: DayExercise,b: DayExercise) => a.sort_order - b.sort_order) : [],
+      exercises: day.exercises_json ? 
+        JSON.parse(day.exercises_json)
+          .sort((a: DayExerciseWithSortOrder, b: DayExerciseWithSortOrder) => a.sort_order - b.sort_order)
+          .map(({sort_order, ...exercise}: DayExerciseWithSortOrder) => exercise) // Remove sort_order from the final exercises
+        : [],
       dayOfWeek: day.dayOfWeek || '', // Ensure dayOfWeek is always a string
     }));
     
