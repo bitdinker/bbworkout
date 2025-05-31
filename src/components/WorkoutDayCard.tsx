@@ -30,17 +30,12 @@ export default function WorkoutDayCard({ day, onDelete }: WorkoutDayCardProps) {
           <Dumbbell className="mr-2 h-6 w-6" />
           {day.name}
         </CardTitle>
-        <CardDescription>{day.exercises.length} exercises</CardDescription>
+        <CardDescription className="text-sm text-muted-foreground">
+ {day.exercises.length} exercises
+ {day.dayOfWeek && <p>{day.dayOfWeek}</p>}
+ </CardDescription>
       </CardHeader>
-      <CardContent>
-        {day.exercises.length > 0 ? (
-          <ul className="list-disc list-inside text-sm text-muted-foreground pl-1 space-y-1 max-h-32 overflow-y-auto">
-            {day.exercises.slice(0, 5).map(ex => <li key={ex.instanceId} className="truncate">{ex.name}</li>)}
-            {day.exercises.length > 5 && <li>...and {day.exercises.length - 5} more</li>}
-          </ul>
-        ) : (
-          <p className="text-sm text-muted-foreground">No exercises added yet.</p>
-        )}
+      <CardContent className="text-sm text-muted-foreground">
       </CardContent>
       <CardFooter className="flex justify-end space-x-2">
         <AlertDialog>

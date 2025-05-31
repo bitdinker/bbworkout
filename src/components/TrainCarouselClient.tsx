@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import type { WorkoutDay } from '@/lib/types';
 import { useWorkoutDays } from '@/hooks/useWorkoutDays';
-import { PREDEFINED_EXERCISES, generateAiHint } from '@/data/predefined-exercises';
+import { generateAiHint } from '@/data/predefined-exercises';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TrainCarouselClientProps {
   dayId: string;
@@ -19,6 +20,7 @@ interface TrainCarouselClientProps {
 
 export default function TrainCarouselClient({ dayId }: TrainCarouselClientProps) {
   const { getWorkoutDayByIdQuery } = useWorkoutDays();
+  const isMobile = useIsMobile(); // isMobile can be used for other responsive adjustments if needed
   const { data: day, isLoading: dayLoading, error: dayError } = getWorkoutDayByIdQuery(dayId);
 
   if (dayLoading) {
@@ -77,7 +79,7 @@ export default function TrainCarouselClient({ dayId }: TrainCarouselClientProps)
   }
 
   return (
-    <div className="max-w-2xl mx-auto relative">
+    <div className="max-w-2xl mx-auto relative px-4 sm:px-6 lg:px-8">
       <Button variant="outline" size="sm" className="absolute top-0 left-0 -mt-12" asChild>
         <Link href="/">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -131,7 +133,7 @@ export default function TrainCarouselClient({ dayId }: TrainCarouselClientProps)
           <>
             <CarouselPrevious className="ml-[-30px] md:ml-[-50px] text-primary border-primary hover:bg-primary/10" />
             <CarouselNext className="mr-[-30px] md:mr-[-50px] text-primary border-primary hover:bg-primary/10" />
-          </>
+          </> 
         )}
       </Carousel>
     </div>
