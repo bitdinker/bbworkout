@@ -25,7 +25,7 @@ async function fetchWorkoutDayById(dayId: string): Promise<WorkoutDay | null> {
   return response.json();
 }
 
-async function createWorkoutDay(newDayData: { name: string, exercises: DayExercise[] }): Promise<WorkoutDay> {
+async function createWorkoutDay(newDayData: { name: string, exercises: DayExercise[], dayOfWeek: string }): Promise<WorkoutDay> {
   const response = await fetch('/api/workout-days', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ export function useWorkoutDays() {
   };
 
 
-  const addWorkoutDayMutation = useMutation<WorkoutDay, Error, { name: string, exercises: DayExercise[] }>({
+  const addWorkoutDayMutation = useMutation<WorkoutDay, Error, { name: string, exercises: DayExercise[], dayOfWeek: string }>({
     mutationFn: createWorkoutDay,
     onSuccess: (newDay) => {
       queryClient.invalidateQueries({ queryKey: [WORKOUT_DAYS_QUERY_KEY] });

@@ -15,6 +15,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       SELECT 
         wd.id, 
         wd.name,
+        wd.dayOfWeek,
         (SELECT json_group_array(
                   json_object(
                     'instanceId', de.instanceId, 
@@ -39,8 +40,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ message: 'Workout day not found' }, { status: 404 });
     }
     
-    const day = {
-      ...dayRaw,
+    const day: WorkoutDay = {
+      id: dayRaw.id,
+      name: dayRaw.name,
+      dayOfWeek: dayRaw.dayOfWeek || '', // Ensure dayOfWeek is always a string
       exercises: dayRaw.exercises_json ? JSON.parse(dayRaw.exercises_json).sort((a: DayExercise,b: DayExercise) => a.sort_order - b.sort_order) : []
     };
 
@@ -54,7 +57,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   const { dayId } = params;
   try {
-    const { name, exercises = [] } = await request.json() as WorkoutDay;
+    const { name, exercises = [], dayOfWeek = "" } = await request.json() as WorkoutDay;
 
     if (!name) {
       return NextResponse.json({ message: 'Name is required' }, { status: 400 });
@@ -63,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const db = await getDb();
     
     await db.run('BEGIN TRANSACTION;');
-    const result = await db.run('UPDATE workout_days SET name = ? WHERE id = ?', name, dayId);
+    const result = await db.run('UPDATE workout_days SET name = ?, dayOfWeek = ? WHERE id = ?', name, dayOfWeek, dayId);
 
     if (result.changes === 0) {
       await db.run('ROLLBACK;');
@@ -89,7 +92,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
     await db.run('COMMIT;');
 
-    const updatedDay: WorkoutDay = { id: dayId, name, exercises };
+    const updatedDay: WorkoutDay = { id: dayId, name, exercises, dayOfWeek };
     return NextResponse.json(updatedDay);
 
   } catch (error) {

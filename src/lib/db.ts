@@ -26,7 +26,8 @@ async function initializeDb(): Promise<Database<sqlite3.Database, sqlite3.Statem
   await db.exec(`
     CREATE TABLE IF NOT EXISTS workout_days (
       id TEXT PRIMARY KEY,
-      name TEXT NOT NULL
+      name TEXT NOT NULL,
+      dayOfWeek TEXT NOT NULL DEFAULT ''
     );
 
     CREATE TABLE IF NOT EXISTS day_exercises (
@@ -44,6 +45,17 @@ async function initializeDb(): Promise<Database<sqlite3.Database, sqlite3.Statem
 
     CREATE INDEX IF NOT EXISTS idx_day_exercises_workout_day_id ON day_exercises (workout_day_id);
   `);
+  
+  // Migration for existing tables that might not have dayOfWeek
+  try {
+    await db.exec('ALTER TABLE workout_days ADD COLUMN dayOfWeek TEXT NOT NULL DEFAULT ""');
+    console.log("Successfully added dayOfWeek column to workout_days table.");
+  } catch (error) {
+    // Ignore error if column already exists (e.g., "duplicate column name: dayOfWeek")
+    if (!(error as Error).message.includes('duplicate column name')) {
+      console.warn('Could not add dayOfWeek column, it might already exist or another error occurred:', (error as Error).message);
+    }
+  }
   
   return db;
 }
